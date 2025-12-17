@@ -1,0 +1,244 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Premium Black & Gold Theme */
+    --background: 0 0% 3%;
+    --foreground: 45 20% 95%;
+
+    --card: 0 0% 6%;
+    --card-foreground: 45 20% 95%;
+
+    --popover: 0 0% 6%;
+    --popover-foreground: 45 20% 95%;
+
+    /* Gold primary */
+    --primary: 45 70% 50%;
+    --primary-foreground: 0 0% 3%;
+
+    /* Dark secondary */
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 45 20% 95%;
+
+    --muted: 0 0% 12%;
+    --muted-foreground: 45 10% 60%;
+
+    /* Gold accent */
+    --accent: 45 70% 50%;
+    --accent-foreground: 0 0% 3%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 45 20% 95%;
+
+    --border: 45 20% 20%;
+    --input: 0 0% 15%;
+    --ring: 45 70% 50%;
+
+    --radius: 0.5rem;
+
+    /* Custom gold shades */
+    --gold: 45 70% 50%;
+    --gold-light: 45 60% 65%;
+    --gold-dark: 45 80% 35%;
+    --gold-muted: 45 30% 40%;
+
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(45, 70%, 50%) 0%, hsl(35, 80%, 45%) 100%);
+    --gradient-gold-shine: linear-gradient(135deg, hsl(45, 70%, 60%) 0%, hsl(45, 70%, 50%) 50%, hsl(35, 80%, 45%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(0, 0%, 6%) 0%, hsl(0, 0%, 3%) 100%);
+    --gradient-radial: radial-gradient(ellipse at center, hsl(0, 0%, 10%) 0%, hsl(0, 0%, 3%) 70%);
+
+    /* Shadows */
+    --shadow-gold: 0 4px 30px -5px hsl(45, 70%, 50%, 0.3);
+    --shadow-gold-lg: 0 10px 50px -10px hsl(45, 70%, 50%, 0.4);
+    --shadow-dark: 0 10px 40px -10px hsl(0, 0%, 0%, 0.5);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 45 20% 95%;
+    --sidebar-primary: 45 70% 50%;
+    --sidebar-primary-foreground: 0 0% 3%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 45 20% 95%;
+    --sidebar-border: 45 20% 15%;
+    --sidebar-ring: 45 70% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-gold-shine);
+  }
+
+  .border-gradient-gold {
+    border-image: var(--gradient-gold) 1;
+  }
+
+  .bg-gradient-gold {
+    background: var(--gradient-gold);
+  }
+
+  .bg-gradient-dark {
+    background: var(--gradient-dark);
+  }
+
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+
+  .shadow-gold-lg {
+    box-shadow: var(--shadow-gold-lg);
+  }
+
+  .glow-gold {
+    box-shadow: 0 0 30px hsl(45, 70%, 50%, 0.2), 0 0 60px hsl(45, 70%, 50%, 0.1);
+  }
+
+  .glass-dark {
+    @apply bg-card/80 backdrop-blur-xl border border-border/50;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.8s ease-out forwards;
+  }
+
+  .animate-fade-in-down {
+    animation: fadeInDown 0.8s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
+
+  .animate-pulse-gold {
+    animation: pulseGold 2s infinite;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+
+  .animation-delay-800 {
+    animation-delay: 800ms;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulseGold {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(45, 70%, 50%, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(45, 70%, 50%, 0.5);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(0, 0%, 6%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(45, 30%, 30%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(45, 50%, 40%);
+}
