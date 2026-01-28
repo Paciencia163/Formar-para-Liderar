@@ -1,8 +1,17 @@
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, User, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const navLinks = [
   { href: "/", label: "Início" },
@@ -14,7 +23,27 @@ const navLinks = [
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Sessão terminada");
+    navigate("/");
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass-dark">
@@ -50,11 +79,46 @@ export function Header() {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden lg:block">
-            <Button asChild variant="gold" size="lg">
-              <Link to="/candidaturas/formulario">Candidatar-se</Link>
-            </Button>
+          {/* CTA Button / User Menu */}
+          <div className="hidden lg:flex items-center gap-3">
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <User className="w-4 h-4" />
+                    <span className="max-w-32 truncate">{user.email}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link to="/candidato/perfil" className="cursor-pointer">
+                      <User className="w-4 h-4 mr-2" />
+                      Meu Perfil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Terminar Sessão
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <>
+                <Button asChild variant="outline">
+                  <Link to="/auth/candidato">Entrar</Link>
+                </Button>
+                <Button asChild variant="gold" size="lg">
+                  <Link to="/candidaturas/formulario">Candidatar-se</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/admin">
+                    <Shield className="w-4 h-4 mr-2" />
+                    Área Reservada
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -88,12 +152,40 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-4 mt-2 border-t border-border">
-              <Button asChild variant="gold" className="w-full" size="lg">
-                <Link to="/candidaturas/formulario" onClick={() => setIsMenuOpen(false)}>
-                  Candidatar-se Agora
-                </Link>
-              </Button>
+            <div className="pt-4 mt-2 border-t border-border space-y-2">
+              {user ? (
+                <>
+                  <Button asChild variant="outline" className="w-full gap-2">
+                    <Link to="/candidato/perfil" onClick={() => setIsMenuOpen(false)}>
+                      <User className="w-4 h-4" />
+                      Meu Perfil
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" className="w-full gap-2 text-destructive" onClick={() => { handleLogout(); setIsMenuOpen(false); }}>
+                    <LogOut className="w-4 h-4" />
+                    Terminar Sessão
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild variant="outline" className="w-full">
+                    <Link to="/auth/candidato" onClick={() => setIsMenuOpen(false)}>
+                      Entrar
+                    </Link>
+                  </Button>
+                  <Button asChild variant="gold" className="w-full" size="lg">
+                    <Link to="/candidaturas/formulario" onClick={() => setIsMenuOpen(false)}>
+                      Candidatar-se Agora
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" className="w-full gap-2">
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                      <Shield className="w-4 h-4" />
+                      Área Reservada
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
         </div>

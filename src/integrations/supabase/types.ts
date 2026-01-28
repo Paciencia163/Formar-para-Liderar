@@ -39,6 +39,7 @@ export type Database = {
           scholarship_type: Database["public"]["Enums"]["scholarship_type"]
           status: Database["public"]["Enums"]["application_status"]
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           address: string
@@ -64,6 +65,7 @@ export type Database = {
           scholarship_type: Database["public"]["Enums"]["scholarship_type"]
           status?: Database["public"]["Enums"]["application_status"]
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           address?: string
@@ -89,6 +91,7 @@ export type Database = {
           scholarship_type?: Database["public"]["Enums"]["scholarship_type"]
           status?: Database["public"]["Enums"]["application_status"]
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -151,7 +154,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "moderator"
+      app_role: "admin" | "moderator" | "candidato"
       application_status: "nova" | "em_analise" | "aprovada" | "rejeitada"
       education_level:
         | "primario"
@@ -291,7 +294,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator"],
+      app_role: ["admin", "moderator", "candidato"],
       application_status: ["nova", "em_analise", "aprovada", "rejeitada"],
       education_level: [
         "primario",

@@ -11,6 +11,8 @@ import CandidaturaForm from "./pages/CandidaturaForm";
 import Contactos from "./pages/Contactos";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import CandidatoLogin from "./pages/auth/CandidatoLogin";
+import PerfilCandidato from "./pages/candidato/Perfil";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +30,8 @@ const App = () => (
           <Route path="/candidaturas" element={<Candidaturas />} />
           <Route path="/candidaturas/formulario" element={<CandidaturaForm />} />
           <Route path="/contactos" element={<Contactos />} />
+          <Route path="/auth/candidato" element={<CandidatoLogin />} />
+          <Route path="/candidato/perfil" element={<PerfilCandidato />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />

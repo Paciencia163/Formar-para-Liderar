@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Loader2, LogOut, User } from "lucide-react";
 
 const provinces = ["Bengo", "Benguela", "Bié", "Cabinda", "Cuando Cubango", "Cuanza Norte", "Cuanza Sul", "Cunene", "Huambo", "Huíla", "Luanda", "Lunda Norte", "Lunda Sul", "Malanje", "Moxico", "Namibe", "Uíge", "Zaire"];
 
@@ -18,6 +18,8 @@ export default function CandidaturaForm() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     full_name: "", birth_date: "", bi_number: "", phone: "", email: "", province: "", municipality: "", address: "",
     education_level: "", institution: "", course: "", current_year: "",
@@ -26,6 +28,45 @@ export default function CandidaturaForm() {
     motivation: "",
     declaration_accepted: false,
   });
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      navigate("/auth/candidato");
+      return;
+    }
+    setUser(session.user);
+    
+    // Pre-fill form with user data
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", session.user.id)
+      .maybeSingle();
+    
+    if (profile) {
+      setFormData(prev => ({
+        ...prev,
+        full_name: profile.full_name || "",
+        email: profile.email || session.user.email || "",
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        email: session.user.email || "",
+      }));
+    }
+    setLoading(false);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth/candidato");
+  };
 
   const updateField = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -36,6 +77,10 @@ export default function CandidaturaForm() {
       toast.error("Deve aceitar a declaração de veracidade");
       return;
     }
+    if (!user) {
+      toast.error("Deve estar autenticado para submeter");
+      return;
+    }
     setIsSubmitting(true);
     try {
       const { current_year, household_members, ...rest } = formData;
@@ -43,11 +88,13 @@ export default function CandidaturaForm() {
         ...rest,
         current_year: current_year ? parseInt(current_year) : null,
         household_members: parseInt(household_members),
+        user_id: user.id,
       } as any);
       if (error) throw error;
       toast.success("Candidatura submetida com sucesso!");
       navigate("/candidaturas");
-    } catch (error) {
+    } catch (error: any) {
+      console.error(error);
       toast.error("Erro ao submeter candidatura. Tente novamente.");
     } finally {
       setIsSubmitting(false);
@@ -151,17 +198,43 @@ export default function CandidaturaForm() {
     }
   };
 
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <section className="py-24 bg-gradient-dark">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
+            {/* User Info Bar */}
+            <div className="flex items-center justify-between mb-8 p-4 rounded-xl bg-card border border-border">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <div className="text-sm font-medium">{user?.email}</div>
+                  <div className="text-xs text-muted-foreground">Candidato</div>
+                </div>
+              </div>
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
+                <LogOut className="w-4 h-4 mr-2" /> Sair
+              </Button>
+            </div>
+
             <h1 className="font-serif text-4xl md:text-5xl font-bold mb-6 text-center">
               Formulário de <span className="text-gradient-gold">Candidatura</span>
             </h1>
             <div className="flex justify-center gap-2 mb-12 flex-wrap">
               {steps.map((step, i) => (
-                <div key={step} className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs ${i === currentStep ? "bg-primary text-primary-foreground" : i < currentStep ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
+                <div key={step} className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs transition-all ${i === currentStep ? "bg-primary text-primary-foreground" : i < currentStep ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"}`}>
                   {i < currentStep ? <Check className="w-3 h-3" /> : <span>{i + 1}</span>}
                   <span className="hidden sm:inline">{step}</span>
                 </div>

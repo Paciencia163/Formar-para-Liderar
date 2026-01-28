@@ -53,7 +53,7 @@ export default function Contactos() {
                   <Phone className="w-6 h-6 text-primary mt-1" />
                   <div>
                     <h3 className="font-semibold mb-1">Telefone</h3>
-                    <p className="text-muted-foreground">+244 923 456 789</p>
+                    <p className="text-muted-foreground">+244 922 812 244</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4 p-4 rounded-xl bg-card border border-border">
